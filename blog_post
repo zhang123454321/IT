@@ -1,0 +1,152 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+// 博客实体类
+class Blog {
+    private static int count = 0;
+    private int id;
+    private String title;
+    private String content;
+    private String author;
+
+    public Blog(String title, String content, String author) {
+        this.id = ++count;
+        this.title = title;
+        this.content = content;
+        this.author = author;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void display() {
+        System.out.println("ID: " + id);
+        System.out.println("标题: " + title);
+        System.out.println("作者: " + author);
+        System.out.println("内容: " + content);
+        System.out.println("--------------");
+    }
+}
+
+// 用户实体类
+class User {
+    private String username;
+
+    public User(String username) {
+        this.username = username;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+}
+
+// 博客服务类
+class BlogService {
+    private List<Blog> blogs = new ArrayList<>();
+
+    public void publishBlog(String title, String content, String author) {
+        Blog blog = new Blog(title, content, author);
+        blogs.add(blog);
+        System.out.println("博客发表成功！博客ID为：" + blog.getId());
+    }
+
+    public void listBlogs() {
+        if (blogs.isEmpty()) {
+            System.out.println("当前没有任何博客。");
+            return;
+        }
+        for (Blog blog : blogs) {
+            blog.display();
+        }
+    }
+
+    public void searchByTitle(String keyword) {
+        boolean found = false;
+        for (Blog blog : blogs) {
+            if (blog.getTitle().contains(keyword)) {
+                blog.display();
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("未找到相关博客。");
+        }
+    }
+}
+
+// 主程序
+public class BlogApp {
+    private static BlogService blogService = new BlogService();
+    private static User currentUser;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("欢迎使用简易博客系统");
+        System.out.print("请输入用户名登录：");
+        String username = scanner.nextLine();
+        currentUser = new User(username);
+        System.out.println("欢迎你，" + currentUser.getUsername() + "！");
+
+        while (true) {
+            showMenu();
+            String choice = scanner.nextLine();
+
+            switch (choice) {
+                case "1":
+                    publishBlog(scanner);
+                    break;
+                case "2":
+                    blogService.listBlogs();
+                    break;
+                case "3":
+                    searchBlog(scanner);
+                    break;
+                case "4":
+                    System.out.println("感谢使用，再见！");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("无效的选项，请重新输入。");
+            }
+        }
+    }
+
+    private static void showMenu() {
+        System.out.println("\n请选择操作：");
+        System.out.println("1. 发表博客");
+        System.out.println("2. 查看所有博客");
+        System.out.println("3. 搜索博客（按标题）");
+        System.out.println("4. 退出系统");
+        System.out.print("请输入选项（1-4）：");
+    }
+
+    private static void publishBlog(Scanner scanner) {
+        System.out.print("请输入博客标题：");
+        String title = scanner.nextLine();
+        System.out.print("请输入博客内容：");
+        String content = scanner.nextLine();
+        blogService.publishBlog(title, content, currentUser.getUsername());
+    }
+
+    private static void searchBlog(Scanner scanner) {
+        System.out.print("请输入搜索关键词：");
+        String keyword = scanner.nextLine();
+        blogService.searchByTitle(keyword);
+    }
+}
